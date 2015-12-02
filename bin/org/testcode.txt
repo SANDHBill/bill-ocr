@@ -1,0 +1,81 @@
+//	public static BufferedImage toBufferedImage(Image img_)
+//	{
+//		
+//	    if (img_ instanceof BufferedImage)
+//	    {
+//	        return (BufferedImage) img_;
+//	    }
+//
+//	    // Create a buffered image with transpa
+//	    BufferedImage bimage = new BufferedImage((int)img_.getWidth(), (int)img_.getHeight(), BufferedImage.TYPE_INT_ARGB);
+//
+//	    // Draw the image on to the buffered image
+//	    Graphics2D bGr = bimage.createGraphics();
+//	    bGr.drawImage(img_, 0, 0, null);
+//	    bGr.dispose();
+//
+//	    // Return the buffered image
+//	    return bimage;
+//	}
+//	
+
+
+//		BufferedImage x =  SwingFXUtils.fromFXImage(fxImage, null);
+//		try {
+//			ImageIO.write(x, "png", new File("/Users/user/testdelete.jpg"));
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+
+
+// Convert image to Mat
+	//It didnt work!
+	private Mat matify1(BufferedImage im) {
+	    // Convert INT to BYTE
+	    im = new BufferedImage(im.getWidth(), im.getHeight(),BufferedImage.TYPE_3BYTE_BGR);
+	    // Convert bufferedimage to byte array
+	    byte[] pixels = ((DataBufferByte) im.getRaster().getDataBuffer())
+	            .getData();
+
+	    // Create a Matrix the same size of image
+	    Mat imagem = new Mat(im.getHeight(), im.getWidth(), CvType.CV_8UC3);
+	    // Fill Matrix with image values
+	    imagem.put(0, 0, pixels);
+	    //Mat returnval = Mat.zeros( imagem.size(), imagem.type() );
+	    //imagem.convertTo(returnval, Imgproc.COLOR_BGR2GRAY);
+	    
+	    //imagem.release();
+	    //Imgproc.cvtColor(imagem, imagem, Imgproc.COLOR_BGR2GRAY,1);
+	    //showResult(imagem);
+
+	    return imagem;
+
+	}
+	
+	public static void showResult(Mat img) {
+	    Imgproc.resize(img, img, new Size(640, 480));
+	    MatOfByte matOfByte = new MatOfByte();
+	    Imgcodecs.imencode(".jpg", img, matOfByte);
+	    byte[] byteArray = matOfByte.toArray();
+	    BufferedImage bufImage = null;
+	    try {
+	        InputStream in = new ByteArrayInputStream(byteArray);
+	        bufImage = ImageIO.read(in);
+	        JFrame frame = new JFrame();
+	        frame.getContentPane().add(new JLabel(new ImageIcon(bufImage)));
+	        frame.pack();
+	        frame.setVisible(true);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	}
+	
+	//import javax.swing.ImageIcon;
+//import javax.swing.JFrame;
+//import javax.swing.JLabel;
+import java.awt.image.DataBufferByte;
+//import java.io.InputStream;
+//import java.util.ArrayList;
+	
+//System.out.println("Clicked, x:" + mouseEvent.getSceneX() + " y:" + mouseEvent.getSceneY());
