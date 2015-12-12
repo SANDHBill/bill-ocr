@@ -1,9 +1,10 @@
 package com.sandh.billanalyzer.utility;
 
-import org.opencv.core.Mat;
-import org.opencv.core.Size;
+import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringJoiner;
 
 
@@ -117,8 +118,46 @@ public class ImageFilter extends AbstractTraceableOperator {
 
         return imageMatOut;
     }
+    public ImageFilter clearSmallBlackDots(int contourSize, double threshold){
+        proccessPreFileterActions();
 
+        this.imageMatOut = clearSmallBlackDots(this.imageMat, contourSize, threshold);
 
+        return processPostFilterActions("clearSmallBlackDots:contourSize "+contourSize+" threshold "+threshold);
+    }
+    private Mat clearSmallBlackDots(Mat imageMatIn,int contourSize, double threshold){
+        Mat imageMatOut = new Mat();
+        imageMatIn.copyTo(imageMatOut);
+        List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
+        Mat hierarchy = new Mat();
+        Imgproc.findContours(imageMatIn, contours, hierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);;
+        for(MatOfPoint contour : contours)
+        {
+            Rect R = Imgproc.boundingRect(contour);
+            if( R.width*R.height < contourSize )
+            {
+                Mat roi = new Mat(imageMatIn,R);
+                if (Core.countNonZero(roi) < R.width*R.height*threshold ) {
+                    Imgproc.rectangle(imageMatOut, R.tl(), R.br(), new Scalar(255, 255, 255));
+                    Mat croi = new Mat(imageMatOut, R);
+                    croi.setTo(new Scalar(255, 255, 255)); // this line is to clear small dots
+                }
+            }
+        }
+        return imageMatOut;
+    }
+    private Mat morphologicalOperations(Mat imageMatIn){
+        Mat imageMatOut = new Mat();
+        //Mat kernel = Mat.ones(3, 3, CvType.CV_8UC1);
+        //System.out.println("Kernel Mat"+kernel.dump());
+        //Imgproc.dilate(imageMatIn, imageMatOut, kernel, new Point(-1,-1),1);
+        //Imgproc.threshold(imageMatOut, imageMatOut, 220, 255, Imgproc.THRESH_BINARY );
+        //Imgproc.dilate(imageMatOut, imageMatOut, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3, 3)));
+        //Imgproc.erode(imageMatIn, imageMatOut, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(8,8)));
+        Imgproc.erode(imageMatIn, imageMatOut, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(5,5)));
+        //Imgproc.dilate(imageMatOut, imageMatOut, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(4,4)));
+        return imageMatOut;
+    }
 
     private ImageFilter processPostFilterActions(String operation) {
         this.lastOperation = operation;
@@ -130,6 +169,7 @@ public class ImageFilter extends AbstractTraceableOperator {
 
         return new ImageFilter(this);
     }
+
     private  synchronized void proccessPreFileterActions() {
         if(used) {
             throw new RuntimeException("Filter has been used. No new operation is permitted.");
