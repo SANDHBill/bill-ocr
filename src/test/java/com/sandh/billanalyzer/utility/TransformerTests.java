@@ -42,7 +42,7 @@ public class TransformerTests {
 	}
 
 
-	@Test
+
 	public void testTransformersGrayScaleBlackAndWhite() {
 
 		List<SampleReceipt> results = new ArrayList<>();
@@ -59,7 +59,7 @@ public class TransformerTests {
 		Assert.assertTrue(true);
 	}
 
-	@Test
+
 	public void testTransformersGrayScaleBlackAndWhiteAdaptive() {
 
 		List<SampleReceipt> results = new ArrayList<>();

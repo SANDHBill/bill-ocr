@@ -14,6 +14,17 @@ public class SampleReceipt {
     private InputStream imageInputStream;
     private StringBuffer resultProccessingParameters = new StringBuffer();
 
+    public void setHistory(FilterHistory history) {
+        this.history = history;
+    }
+
+    public FilterHistory getHistory() {
+        return history;
+    }
+
+    private FilterHistory history;
+
+
     public SampleReceipt(URL imageUrl, URL textUrl) {
         this.imageURL = imageUrl;
         this.textURL = textUrl;

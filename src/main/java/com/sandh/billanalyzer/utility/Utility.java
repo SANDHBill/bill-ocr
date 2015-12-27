@@ -22,16 +22,16 @@ public class Utility {
 
     private static Logger LOG = LoggerFactory.getLogger(Utility.class.getName());
 
-    public static  File getTempFile(String originName,String paramters,String transformerName) throws IOException {
+    public static  File getTempFile(String originName,String paramters,String transformerName,String extension) throws IOException {
         String debugOutputFolder = System.getProperty(TEST_RECEIPTS_OUTPUT);
-        String fileName=originName + "_" +
+        String fileName="input_"+originName + "_output_" + extension + "_" +
                 transformerName+"_"
                 +paramters+"_";
 
         DateTimeFormatter FORMATTER =
                 DateTimeFormatter.ofPattern("u-MMM-dd-HHMMSS");
         String datetime= ZonedDateTime.now().format(FORMATTER);
-        String fileSuffix =String.valueOf(datetime + ".png");
+        String fileSuffix =String.valueOf(datetime + "." + extension);
         File dir = null;
         File tempFile = null;
         if(null != debugOutputFolder){
@@ -54,11 +54,15 @@ public class Utility {
 
         File file =storeImageStreamInTempFile(
                 matToInputStream(imageMat),
-                traceableOperator);
+                traceableOperator,"png");
     }
-
+    public static void storeTextInTempFile(String text, TraceableOperator filter) {
+        File file =storeImageStreamInTempFile(
+                new ByteArrayInputStream(text.getBytes()),
+                filter,"txt");
+    }
     public static File storeImageStreamInTempFile(InputStream imageStreamIn,
-                                            TraceableOperator traceableOperator) {
+                                            TraceableOperator traceableOperator,String optionalExtension) {
         File tempFile = null;
 
         try {
@@ -66,7 +70,7 @@ public class Utility {
             tempFile = Utility.getTempFile(
                     traceableOperator.getOriginName(),
                     traceableOperator.getParameters(),
-                    traceableOperator.getOperation());
+                    traceableOperator.getOperation(),optionalExtension);
             FileOutputStream fos = new FileOutputStream(tempFile);
             fos.write(imageBytes);
             fos.flush();
@@ -101,5 +105,6 @@ public class Utility {
         // buffer
         return new ByteArrayInputStream(buffer.toArray());
     }
+
 
 }

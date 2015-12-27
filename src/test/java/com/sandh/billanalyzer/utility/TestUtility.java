@@ -72,11 +72,13 @@ public class TestUtility {
                 ImageFilter newImage =scenarioExecuter.executeScenario(imageFilter);
 
 
-                OCRTransformer ocrTransformer = new OCRTransformer();
+                OCRTransformer ocrTransformer = new OCRTransformer(newImage.getHistory());
 
                 sampleReceipt.setResult(ocrTransformer.transform(newImage));
+                sampleReceipt.setHistory(ocrTransformer.getHistory());
                 results.add(sampleReceipt);
 
+                SaveHistoryToFile(sampleReceipt);
                 LOG.info(TestUtility.getSampleRecieptDetails(sampleReceipt));
             } catch (FileNotFoundException e) {
                 // TODO Auto-generated catch block
@@ -85,6 +87,21 @@ public class TestUtility {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
+        }
+    }
+
+    private static void SaveHistoryToFile(SampleReceipt sampleReceipt) {
+        for(TraceableOperator filter:sampleReceipt.getHistory().getHistoryItems()){
+            if(null!= filter.getProcessMaterial().getAsImageFilter()) {
+                Utility.storeImageMatInTempFile(
+                        filter.getProcessMaterial().getAsImageFilter().getImageMat(),
+                        filter);
+            }else if(null!= filter.getProcessMaterial().getAsString()){
+                Utility.storeTextInTempFile(
+                        filter.getProcessMaterial().getAsString(),
+                        filter);
+            }
+            LOG.info(filter.getOperation());
         }
     }
 }

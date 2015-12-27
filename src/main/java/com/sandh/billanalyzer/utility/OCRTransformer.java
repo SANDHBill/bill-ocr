@@ -15,11 +15,15 @@ import static org.bytedeco.javacpp.lept.pixRead;
  */
 public class OCRTransformer extends AbstractTraceableOperator implements Transformer {
 
+    private ProcessMaterial processMaterial;
 
+    public OCRTransformer(FilterHistory history){
+        this.setHistory(history);
+    }
 
     @Override
     public String transform(ImageFilter imageFilter) throws IOException {
-        String item =null;
+        final String item;
 
         this.setOriginName(imageFilter.getOriginName());
         this.setDebugMode(imageFilter.isDebugMode());
@@ -27,6 +31,19 @@ public class OCRTransformer extends AbstractTraceableOperator implements Transfo
         Mat imageMat = imageFilter.getImageMat();
         item = applyOCRToImage(imageMat)[0];
 
+        processMaterial = new ProcessMaterial() {
+            @Override
+            public String getAsString() {
+                return item;
+            }
+
+            @Override
+            public ImageFilter getAsImageFilter() {
+                return null;
+            }
+        };
+        this.lastOperation="OCRTransforming";
+        getHistory().add(this);
         return item;
     }
 
@@ -47,7 +64,7 @@ public class OCRTransformer extends AbstractTraceableOperator implements Transfo
             throw new RuntimeException("Unable to initialise OCR lib");
         }
 
-        File tempFile = Utility.storeImageStreamInTempFile(imageStreamIn, this);
+        File tempFile = Utility.storeImageStreamInTempFile(imageStreamIn, this,"png");
 
         // Open input image with leptonica library
         lept.PIX image = pixRead(tempFile.getAbsolutePath());
@@ -58,5 +75,10 @@ public class OCRTransformer extends AbstractTraceableOperator implements Transfo
         outText = api.GetUTF8Text().getString();
 
         return outText;
+    }
+
+    @Override
+    public ProcessMaterial getProcessMaterial() {
+        return processMaterial;
     }
 }

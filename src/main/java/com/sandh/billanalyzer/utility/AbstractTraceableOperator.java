@@ -8,6 +8,19 @@ public abstract class AbstractTraceableOperator implements TraceableOperator {
 	private String parameters="";
 	private String originName="";
 	protected String lastOperation="";
+	private FilterHistory history;
+
+	@Override
+	public FilterHistory getHistory() {
+		return history;
+	}
+
+	@Override
+	public void setHistory(FilterHistory history) {
+		this.history = history;
+	}
+
+
 
 	@Override
 	public String getOriginName() {

@@ -19,8 +19,8 @@ public class ImageFilter extends AbstractTraceableOperator {
 
 
     private  Mat imageMatOut;
-    private final StringJoiner history
-            =new StringJoiner(",","[","]");
+    private ProcessMaterial outputMaterial;
+
 
     public Mat getImageMat() {
         if(used) {
@@ -30,19 +30,18 @@ public class ImageFilter extends AbstractTraceableOperator {
         }
     }
     private ImageFilter(Mat inputImage,
-                        StringJoiner history) {
+                        FilterHistory filterHistory) {
         this.imageMat = inputImage;
-        if(null!=history) {
-            this.history.merge(history);
-        }
+
+        setHistory(filterHistory);
     }
     private ImageFilter(Mat inputImageMat) {
-        this(inputImageMat,null);
+        this(inputImageMat,new FilterHistory());
     }
     private ImageFilter(
             ImageFilter parentImageTransformerFilter) {
         this(parentImageTransformerFilter.imageMatOut,
-                parentImageTransformerFilter.history);
+                parentImageTransformerFilter.getHistory());
         this.setDebugMode(parentImageTransformerFilter.isDebugMode());
         this.setOriginName(parentImageTransformerFilter.getOriginName());
 
@@ -50,7 +49,7 @@ public class ImageFilter extends AbstractTraceableOperator {
 
     public static ImageFilter createFilterForMat(Mat inputImageMat){
         ImageFilter imageTransformerFilter =
-                new ImageFilter(inputImageMat,null);
+                new ImageFilter(inputImageMat);
 
         return  imageTransformerFilter;
     }
@@ -130,7 +129,7 @@ public class ImageFilter extends AbstractTraceableOperator {
         imageMatIn.copyTo(imageMatOut);
         List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
         Mat hierarchy = new Mat();
-        Imgproc.findContours(imageMatIn, contours, hierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);;
+        Imgproc.findContours(imageMatIn, contours, hierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
         for(MatOfPoint contour : contours)
         {
             Rect R = Imgproc.boundingRect(contour);
@@ -161,12 +160,19 @@ public class ImageFilter extends AbstractTraceableOperator {
 
     private ImageFilter processPostFilterActions(String operation) {
         this.lastOperation = operation;
-        history.add(lastOperation);
+        getHistory().add(this);
+        final ImageFilter thisFilter = this;
+        outputMaterial = new ProcessMaterial() {
+            @Override
+            public String getAsString() {
+                return null;
+            }
 
-        if(isDebugMode()){
-            Utility.storeImageMatInTempFile(this.imageMatOut, this);
-        }
-
+            @Override
+            public ImageFilter getAsImageFilter() {
+                return thisFilter;
+            }
+        };
         return new ImageFilter(this);
     }
 
@@ -176,5 +182,10 @@ public class ImageFilter extends AbstractTraceableOperator {
         }
 
         used=true;
+    }
+
+    @Override
+    public ProcessMaterial getProcessMaterial() {
+        return outputMaterial;
     }
 }

@@ -17,4 +17,12 @@ public interface TraceableOperator {
     void setDebugMode(boolean debugMode);
 
     String getOperation();
+
+    ProcessMaterial getProcessMaterial();
+
+    FilterHistory getHistory();
+
+    void setHistory(FilterHistory history);
+
+
 }
