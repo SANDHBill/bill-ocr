@@ -93,4 +93,21 @@ public class TransformerTests {
 		Assert.assertTrue(true);
 	}
 
+	@Test
+	public void testTransformersGrayScaleBlackAndWhiteAdaptiveFindBillClearSmallBlackDots() {
+
+		List<SampleReceipt> results = new ArrayList<>();
+
+		SampleReceiptProvider sampleReceiptProvider = new SampleReceiptProvider();
+
+		TestUtility.sampleRecieptTestExecuter(
+				sampleReceiptProvider,
+				results,
+				imageFilter -> imageFilter.convertToGrayScale()
+						.gaussianBlur().blackAndWhiteImageAdaptive().findBill().clearSmallBlackDots(300, 0.9)
+		);
+
+		Assert.assertTrue(true);
+	}
+
 }

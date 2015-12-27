@@ -145,6 +145,66 @@ public class ImageFilter extends AbstractTraceableOperator {
         }
         return imageMatOut;
     }
+    public ImageFilter findBill(){
+        proccessPreFileterActions();
+
+        this.imageMatOut = findBill(this.imageMat);
+
+        return processPostFilterActions("findBill");
+    }
+    //The input of this function needs to be gray
+    private Mat findBill(Mat imageMatIn){
+        Mat imageMatOut = new Mat();
+        imageMatIn.copyTo(imageMatOut);
+
+        Mat imageMatOut2 = new Mat();
+        imageMatIn.copyTo(imageMatOut2);
+
+        double largest_area=0;
+        int largest_contour_index=0;
+        Rect bounding_rect = new Rect();
+
+        Imgproc.threshold(imageMatIn, imageMatIn, 25, 255, Imgproc.THRESH_BINARY); //Threshold the gray
+
+        List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
+        Mat hierarchy = new Mat();
+        //imageMatIn.adjustROI(1,1,1,1);
+        Imgproc.findContours(imageMatIn, contours, hierarchy, Imgproc.RETR_CCOMP, Imgproc.CHAIN_APPROX_SIMPLE);
+
+        int i = 0;
+        double ar = .9 * imageMatOut2.width()*imageMatOut2.height();
+
+        for(MatOfPoint contour : contours)
+        {
+            i++;
+            double a=Imgproc.contourArea(contour, false);  //  Find the area of contour
+            if(a>largest_area && a < ar){
+                largest_area=a;
+                largest_contour_index=i;                //Store the index of largest contour
+                bounding_rect=Imgproc.boundingRect(contour); // Find the bounding rectangle for biggest contour
+            }
+
+        }
+
+        //Scalar color( 255,255,255);
+        //drawContours( dst, contours,largest_contour_index, color, CV_FILLED, 8, hierarchy ); // Draw the largest contour using previously stored index.
+        Imgproc.rectangle(imageMatOut, bounding_rect.tl(), bounding_rect.br(), new Scalar(0, 255, 0), 1, 8, 0);
+
+        imageMatOut = Mat.zeros(imageMatOut2.size(), imageMatOut.channels());
+        System.out.println("shahram:"+largest_contour_index+" there are "+contours.size());
+
+        Mat mask_image = new Mat( imageMatOut.size(), CvType.CV_8U, new Scalar(0,0,0));
+        Imgproc.drawContours(mask_image, contours, largest_contour_index, new Scalar(0, 255, 0),  -1);
+// copy only non-zero pixels from your image to original image
+        imageMatOut2.copyTo(imageMatOut, mask_image);
+
+        //Imgproc.drawContours(imageMatOut, contours,largest_contour_index, new Scalar(0, 255, 0),  -1);
+
+        Mat cropped = new Mat(imageMatOut2, new Rect(bounding_rect.x, bounding_rect.y,bounding_rect.width,bounding_rect.height));
+
+        //Mat imageMatOut3 = imageMatOut2(bounding_rect);
+        return cropped;
+    }
     private Mat morphologicalOperations(Mat imageMatIn){
         Mat imageMatOut = new Mat();
         //Mat kernel = Mat.ones(3, 3, CvType.CV_8UC1);
