@@ -123,7 +123,7 @@ public class ImageFilter extends AbstractTraceableOperator {
 
         this.imageMatOut = clearSmallBlackDots(this.imageMat, contourSize, threshold);
 
-        return processPostFilterActions("clearSmallBlackDots:contourSize "+contourSize+" threshold "+threshold);
+        return processPostFilterActions("clearSmallBlackDots_contourSize "+contourSize+" threshold "+threshold);
     }
     private Mat clearSmallBlackDots(Mat imageMatIn,int contourSize, double threshold){
         Mat imageMatOut = new Mat();

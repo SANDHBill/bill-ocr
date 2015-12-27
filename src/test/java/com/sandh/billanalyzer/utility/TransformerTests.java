@@ -81,7 +81,7 @@ public class TransformerTests {
 
 		List<SampleReceipt> results = new ArrayList<>();
 
-		SampleReceiptProvider sampleReceiptProvider = new SampleReceiptProvider(1);
+		SampleReceiptProvider sampleReceiptProvider = new SampleReceiptProvider();
 
 		TestUtility.sampleRecieptTestExecuter(
 				sampleReceiptProvider,
