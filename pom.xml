@@ -98,7 +98,8 @@
           <includes>
             <include>**/*Tests.java</include>
           </includes>
-
+          <parallel>methods</parallel>
+          <threadCount>20</threadCount>
           <argLine>-Djava.library.path=${project.build.directory}/lib</argLine>
           <systemProperties>
             <property>
