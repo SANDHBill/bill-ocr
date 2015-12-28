@@ -205,6 +205,50 @@ public class ImageFilter extends AbstractTraceableOperator {
         //Mat imageMatOut3 = imageMatOut2(bounding_rect);
         return cropped;
     }
+
+    public ImageFilter detectLines(){
+        proccessPreFileterActions();
+
+        this.imageMatOut = findLines(this.imageMat);
+
+        return processPostFilterActions("findLines");
+    }
+
+    private Mat findLines(Mat imageMatIn) {
+        Mat imageMatOut = new Mat();
+        Mat imageMatOut2 = new Mat();
+        imageMatIn.copyTo(imageMatOut2);
+
+        Imgproc.Canny(imageMatIn, imageMatOut, 50, 200, 3, true);
+        Mat lines = new Mat();
+        int threshold = 80;
+        int minLineSize = 30;
+        int lineGap = 10;
+
+        Imgproc.HoughLinesP(imageMatOut, lines, 1, Math.PI/180, threshold, minLineSize, lineGap);
+
+        for (int x = 0; x < lines.rows(); x++)
+        {
+            double[] vec = lines.get(x, 0);
+            double x1 = vec[0],
+                    y1 = vec[1],
+                    x2 = vec[2],
+                    y2 = vec[3];
+            Point start = new Point(x1, y1);
+            Point end = new Point(x2, y2);
+
+            double dx = x1 - x2;
+            double dy = y1 - y2;
+
+            double dist = Math.sqrt (dx*dx + dy*dy);
+
+            if(dist>300.d)  // show those lines that have length greater than 300
+                Imgproc.line(imageMatOut2, start, end, new Scalar(0, 0, 255),  1);
+
+        }
+        return imageMatOut2;
+    }
+
     private Mat morphologicalOperations(Mat imageMatIn){
         Mat imageMatOut = new Mat();
         //Mat kernel = Mat.ones(3, 3, CvType.CV_8UC1);
