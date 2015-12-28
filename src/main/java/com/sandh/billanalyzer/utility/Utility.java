@@ -11,8 +11,8 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.StringJoiner;
+
 
 /**
  * Created by hamed on 02/12/2015.
@@ -22,63 +22,46 @@ public class Utility {
 
     private static Logger LOG = LoggerFactory.getLogger(Utility.class.getName());
 
-    public static  File getTempFile(String originName,String paramters,String transformerName,String extension) throws IOException {
-        String debugOutputFolder = System.getProperty(TEST_RECEIPTS_OUTPUT);
-        String fileName="input_"+originName + "_output_" + extension + "_" +
-                transformerName+"_"
-                +paramters+"_";
 
-        DateTimeFormatter FORMATTER =
-                DateTimeFormatter.ofPattern("u-MMM-dd-HHMMSS");
-        String datetime= ZonedDateTime.now().format(FORMATTER);
-        String fileSuffix =String.valueOf(datetime + "." + extension);
-        File dir = null;
-        File tempFile = null;
-        if(null != debugOutputFolder){
-            Path path = Paths.get(debugOutputFolder);
-            if (!Files.isDirectory(path)){
-                Files.createDirectory(path);
-            }
-            dir = path.toFile();
-            tempFile = File.createTempFile(fileName,fileSuffix,dir);
-        }else{
-            tempFile = File.createTempFile(
-                    fileName, fileSuffix, null);
-        }
-
-
-        return tempFile;
-    }
     public static void storeImageMatInTempFile(Mat imageMat,
-                                           TraceableOperator traceableOperator){
+                                           TraceableOperator traceableOperator,
+                                               String prefix){
 
         File file =storeImageStreamInTempFile(
                 matToInputStream(imageMat),
-                traceableOperator,"png");
+                traceableOperator,prefix,"png");
     }
-    public static void storeTextInTempFile(String text, TraceableOperator filter) {
+    public static void storeTextInTempFile(String text, TraceableOperator filter,String prefix) {
         File file =storeImageStreamInTempFile(
                 new ByteArrayInputStream(text.getBytes()),
-                filter,"txt");
+                filter,prefix,"txt");
     }
-    public static File storeImageStreamInTempFile(InputStream imageStreamIn,
-                                            TraceableOperator traceableOperator,String optionalExtension) {
+    public static File storeImageStreamInTempFile(
+                                            InputStream imageStreamIn,
+                                            TraceableOperator traceableOperator,
+                                            String prefix,
+                                            String extension) {
+
+        String fileName = constructFileNameForOperationOutput(traceableOperator,prefix, extension);
+
         File tempFile = null;
 
         try {
+            tempFile = Utility.getTempFile(fileName,"."+extension);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try(FileOutputStream fos = new FileOutputStream(tempFile)){
             byte[] imageBytes = IOUtils.toByteArray(imageStreamIn);
-            tempFile = Utility.getTempFile(
-                    traceableOperator.getOriginName(),
-                    traceableOperator.getParameters(),
-                    traceableOperator.getOperation(),optionalExtension);
-            FileOutputStream fos = new FileOutputStream(tempFile);
+
             fos.write(imageBytes);
             fos.flush();
-            fos.close();
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+
         if(traceableOperator.isDebugMode()) {
             LOG.info("File loc:{}", tempFile.getAbsolutePath());
         }else{
@@ -87,6 +70,51 @@ public class Utility {
         return tempFile;
     }
 
+    public static String constructFileNameForOperationOutput(TraceableOperator traceableOperator,
+                                                             String prefix,
+                                                             String extension) {
+
+        String originalName = getFileName(traceableOperator.getOriginName());
+        StringJoiner fileNameJoiner = new StringJoiner("_");
+        fileNameJoiner.add(prefix);
+        fileNameJoiner.add("input");
+        fileNameJoiner.add(originalName);
+        fileNameJoiner.add("output");
+        fileNameJoiner.add(extension);
+        fileNameJoiner.add(traceableOperator.getOperation());
+        String fileName=fileNameJoiner.toString();
+
+        return fileName;
+    }
+
+    public static String getFileName(String filePath) {
+        Path path= Paths.get(filePath);
+
+        return path.getFileName().toString();
+    }
+
+    public static  File getTempFile(String fileName,
+                                    String extension) throws IOException {
+        String debugOutputFolder = System.getProperty(TEST_RECEIPTS_OUTPUT);
+
+        File dir = null;
+        File tempFile = null;
+        if(null != debugOutputFolder){
+            Path path = Paths.get(debugOutputFolder);
+            path.toFile().mkdirs();
+            if (!Files.isDirectory(path)){
+                Files.createDirectory(path);
+            }
+            dir = path.toFile();
+            tempFile = File.createTempFile(fileName,extension,dir);
+        }else{
+            tempFile = File.createTempFile(
+                    fileName, extension, null);
+        }
+
+
+        return tempFile;
+    }
 
 
     public static Mat readInputStreamIntoMat(InputStream inputStream) throws IOException {

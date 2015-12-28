@@ -1,11 +1,16 @@
 package com.sandh.billanalyzer.utility;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.StringJoiner;
 
 import org.opencv.core.Core;
 
@@ -22,6 +27,8 @@ public class TransformerTests {
 	public static final String OPENCV_JAVA300_DYLIB = "opencv_java300.dylib";
 	public static final String TESSDATA_PREFIX = "TESSDATA_PREFIX";
 	public static final String TESSDATA_PREFIX_DEFAULT_PATH = "src/test/resources/tessdata";
+	public static final String TARGET_SUREFIRE_REPORTS = "target/surefire-reports";
+	public static final String RECIEPTSTESTS = "recieptstests";
 
 	private Logger LOG = LoggerFactory.getLogger(this.getClass().getName());
 
@@ -38,18 +45,41 @@ public class TransformerTests {
 		//System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		System.load(javaLibPath + separator + OPENCV_JAVA300_DYLIB);
 
+		setTempFileOutPutPaths();
+
 
 	}
 
+	private void setTempFileOutPutPaths() {
+		String strPath = System.getProperty(Utility.TEST_RECEIPTS_OUTPUT);
+		StringJoiner testOutPutPath = new StringJoiner(File.separator);
+		testOutPutPath.add(TARGET_SUREFIRE_REPORTS);
+		testOutPutPath.add(RECIEPTSTESTS);
+
+		if( null == strPath){
+
+			try {
+				Path tpath = Paths.get(new File(".").getCanonicalPath());
+				Path target =
+						tpath.getFileSystem().getPath(TARGET_SUREFIRE_REPORTS, RECIEPTSTESTS);
+				target.toFile().mkdirs();
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			System.setProperty(Utility.TEST_RECEIPTS_OUTPUT, testOutPutPath.toString());
+		}
+	}
 
 
+	@Test
 	public void testTransformersGrayScaleBlackAndWhite() {
 
 		List<SampleReceipt> results = new ArrayList<>();
 		
 		SampleReceiptProvider sampleReceiptProvider = new SampleReceiptProvider();
 
-		TestUtility.sampleRecieptTestExecuter(
+		TestUtility.sampleRecieptTestExecuter("testOne",
 				sampleReceiptProvider,
 				results,
 				imageFilter -> imageFilter.convertToGrayScale()
@@ -59,14 +89,14 @@ public class TransformerTests {
 		Assert.assertTrue(true);
 	}
 
-
+	@Test
 	public void testTransformersGrayScaleBlackAndWhiteAdaptive() {
 
 		List<SampleReceipt> results = new ArrayList<>();
 
 		SampleReceiptProvider sampleReceiptProvider = new SampleReceiptProvider(1);
 
-		TestUtility.sampleRecieptTestExecuter(
+		TestUtility.sampleRecieptTestExecuter("test2",
 				sampleReceiptProvider,
 				results,
 				imageFilter -> imageFilter.convertToGrayScale()
@@ -83,7 +113,7 @@ public class TransformerTests {
 
 		SampleReceiptProvider sampleReceiptProvider = new SampleReceiptProvider();
 
-		TestUtility.sampleRecieptTestExecuter(
+		TestUtility.sampleRecieptTestExecuter("Contour",
 				sampleReceiptProvider,
 				results,
 				imageFilter -> imageFilter.convertToGrayScale()
@@ -100,7 +130,7 @@ public class TransformerTests {
 
 		SampleReceiptProvider sampleReceiptProvider = new SampleReceiptProvider();
 
-		TestUtility.sampleRecieptTestExecuter(
+		TestUtility.sampleRecieptTestExecuter("detectBoundries",
 				sampleReceiptProvider,
 				results,
 				imageFilter -> imageFilter.convertToGrayScale()

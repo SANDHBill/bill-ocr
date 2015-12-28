@@ -7,6 +7,7 @@ import org.opencv.core.Mat;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 
 import static org.bytedeco.javacpp.lept.pixRead;
 
@@ -64,7 +65,7 @@ public class OCRTransformer extends AbstractTraceableOperator implements Transfo
             throw new RuntimeException("Unable to initialise OCR lib");
         }
 
-        File tempFile = Utility.storeImageStreamInTempFile(imageStreamIn, this,"png");
+        File tempFile = Utility.storeImageStreamInTempFile(imageStreamIn, this,"OCRIN","png");
 
         // Open input image with leptonica library
         lept.PIX image = pixRead(tempFile.getAbsolutePath());
@@ -73,6 +74,12 @@ public class OCRTransformer extends AbstractTraceableOperator implements Transfo
 
         // Get OCR result
         outText = api.GetUTF8Text().getString();
+
+        try {
+            Files.delete(tempFile.toPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         return outText;
     }

@@ -52,7 +52,7 @@ public class TestUtility {
 
     }
 
-    public static void sampleRecieptTestExecuter(
+    public static void sampleRecieptTestExecuter(String testname,
             SampleReceiptProvider sampleReceiptProvider,
             List<SampleReceipt> results,
             ScenarioExecuter<ImageFilter> scenarioExecuter){
@@ -78,7 +78,7 @@ public class TestUtility {
                 sampleReceipt.setHistory(ocrTransformer.getHistory());
                 results.add(sampleReceipt);
 
-                SaveHistoryToFile(sampleReceipt);
+                SaveHistoryToFile(testname,sampleReceipt);
                 LOG.info(TestUtility.getSampleRecieptDetails(sampleReceipt));
             } catch (FileNotFoundException e) {
                 // TODO Auto-generated catch block
@@ -90,16 +90,16 @@ public class TestUtility {
         }
     }
 
-    private static void SaveHistoryToFile(SampleReceipt sampleReceipt) {
+    private static void SaveHistoryToFile(String testName,SampleReceipt sampleReceipt) {
         for(TraceableOperator filter:sampleReceipt.getHistory().getHistoryItems()){
             if(null!= filter.getProcessMaterial().getAsImageFilter()) {
                 Utility.storeImageMatInTempFile(
                         filter.getProcessMaterial().getAsImageFilter().getImageMat(),
-                        filter);
+                        filter,testName);
             }else if(null!= filter.getProcessMaterial().getAsString()){
                 Utility.storeTextInTempFile(
                         filter.getProcessMaterial().getAsString(),
-                        filter);
+                        filter,testName);
             }
             LOG.info(filter.getOperation());
         }
