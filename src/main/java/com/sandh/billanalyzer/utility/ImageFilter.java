@@ -1,11 +1,14 @@
 package com.sandh.billanalyzer.utility;
 
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 
 /**
@@ -387,6 +390,156 @@ public class ImageFilter extends AbstractTraceableOperator {
         Imgproc.erode(imageMatIn, imageMatOut, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(5,5)));
         //Imgproc.dilate(imageMatOut, imageMatOut, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(4,4)));
         return imageMatOut;
+    }
+
+    public int crop_area(Mat imageMat){
+        return imageMat.width() * imageMat.height();
+    }
+
+    private float ratio(Mat im) {
+        //im = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+        //_, im = cv2.threshold(im, 127, 255, 0)
+        int nzCount = Core.countNonZero(im);
+        int area = crop_area(im);
+        return nzCount / (float)(area - nzCount);
+    }
+
+    private Mat crop_2(Mat im,int x,int xw,int y,int yh) {
+        Mat crop_img = im.submat(y,yh, x,xw);
+        return crop_img;
+    }
+
+    private Float[] findX(Mat orig1) {
+        int height = orig1.height();
+        int width = orig1.width();
+        //int channels = orig1.channels();
+
+        Mat orig = new Mat();
+        Imgproc.cvtColor(orig1, orig, Imgproc.COLOR_BGR2GRAY);
+        Imgproc.threshold(orig, orig, 127, 255, 0);
+        int w_n = 50;
+        int h_n = 50;
+        int w_st = width / w_n;
+        int h_st = height / h_n;
+
+        int yh = height;
+        int y = 0;
+        int xw = w_st;
+        int x = 0;
+
+        List<Float> rs = new ArrayList<Float>();
+        int count = 0;
+        Mat crop = crop_2(orig, x, xw, y, yh);
+        float r = ratio(crop);
+        rs.add(r);
+        while ((x < width - w_st*2)) {
+            x = x + w_st;
+            xw = xw + w_st;
+            crop = crop_2(orig, x, xw, y, yh);
+            r = ratio(crop);
+            rs.add(r);
+            count = count + 1;
+        }
+        DescriptiveStatistics stats = new DescriptiveStatistics();
+
+        // Add the data from the array
+        for( int i = 0; i < rs.size(); i++) {
+            stats.addValue(rs.get(i));
+        }
+
+// Compute some statistics
+        //double mean = stats.getMean();
+        //double std = stats.getStandardDeviation();
+        double median = stats.getPercentile(50);
+
+        int[] indexes = IntStream.range(0, rs.size())
+                .filter(i -> rs.get(i) > median)
+                .toArray();
+
+        //List<Float> indexes = rs.stream().filter( t -> t > median).collect(Collectors.toList());
+
+        Float index = (float)indexes[0];
+        Float index1 = index * w_st;
+        Float index2 = (float)indexes[indexes.length-1] ;
+        index2 = index2 * w_st;
+        return new Float[] {index1,index2};
+    }
+
+    private Float[] findY(Mat orig1) {
+        int height = orig1.height();
+        int width = orig1.width();
+        //int channels = orig1.channels();
+
+        Mat orig = new Mat();
+        Imgproc.cvtColor(orig1, orig, Imgproc.COLOR_BGR2GRAY);
+        Imgproc.threshold(orig, orig, 127, 255, 0);
+        int w_n = 50;
+        int h_n = 50;
+        int w_st = width / w_n;
+        int h_st = height / h_n;
+
+        int yh = h_st;
+        int y = 0;
+        int xw = width;
+        int x = 0;
+
+        List<Float> rs = new ArrayList<Float>();
+        int count = 0;
+        Mat crop = crop_2(orig, x, xw, y, yh);
+        float r = ratio(crop);
+        rs.add(r);
+        while ((y < height - h_st*2)) {
+            y = y + h_st;
+            yh = yh + h_st;
+            crop = crop_2(orig, x, xw, y, yh);
+            r = ratio(crop);
+            rs.add(r);
+            count = count + 1;
+        }
+        DescriptiveStatistics stats = new DescriptiveStatistics();
+
+        // Add the data from the array
+        for( int i = 0; i < rs.size(); i++) {
+            stats.addValue(rs.get(i));
+        }
+
+// Compute some statistics
+        //double mean = stats.getMean();
+        //double std = stats.getStandardDeviation();
+        double median = stats.getPercentile(50);
+
+        int[] indexes = IntStream.range(0, rs.size())
+                .filter(i -> rs.get(i) > median)
+                .toArray();
+
+
+        //List<Float> indexes = rs.stream().filter( t -> t > median).collect(Collectors.toList());
+
+        Float index = (float)indexes[0];
+        Float index1 = index * h_st;
+        Float index2 = (float)indexes[indexes.length-1] ;
+        index2 = index2 * h_st;
+        return new Float[] {index1,index2};
+    }
+
+    private Mat findBill2(Mat imageMat){
+        Mat orig = new Mat();
+        Imgproc.cvtColor(imageMat, orig, Imgproc.COLOR_BGR2GRAY);
+        Imgproc.threshold(orig, orig, 127, 255, 0);
+
+
+        Float[] xs = findX(imageMat);
+        Float[] ys = findY(imageMat);
+
+        return crop_2(imageMat,xs[0].intValue(),xs[1].intValue(), ys[0].intValue(),ys[1].intValue());
+    }
+
+    public ImageFilter findBill2(){
+        proccessPreFileterActions();
+
+        this.imageMatOut = findBill2(this.imageMat);
+
+        return processPostFilterActions("findBill2");
     }
 
     private ImageFilter processPostFilterActions(String operation) {

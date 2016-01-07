@@ -134,7 +134,23 @@ public class TransformerTests {
 				sampleReceiptProvider,
 				results,
 				imageFilter -> imageFilter.convertToGrayScale()
-						.gaussianBlur().blackAndWhiteImageAdaptive().findBill().clearSmallBlackDots(300, 0.9)
+						.gaussianBlur().blackAndWhiteImageAdaptive().detectLines().clearSmallBlackDots(300, 0.9)
+		);
+
+		Assert.assertTrue(true);
+	}
+
+	@Test
+	public void testTransformersFindBill2() {
+
+		List<SampleReceipt> results = new ArrayList<>(1);
+
+		SampleReceiptProvider sampleReceiptProvider = new SampleReceiptProvider();
+
+		TestUtility.sampleRecieptTestExecuter("FindBill2",
+				sampleReceiptProvider,
+				results,
+				imageFilter -> imageFilter.findBill2().convertToGrayScale().blackAndWhiteImageAdaptive()
 		);
 
 		Assert.assertTrue(true);
