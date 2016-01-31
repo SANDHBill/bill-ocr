@@ -141,16 +141,18 @@ public class TransformerTests {
 	}
 
 	@Test
-	public void testTransformersFindBill2() {
+	public void testTransformersFindBill() {
 
 		List<SampleReceipt> results = new ArrayList<>(1);
 
 		SampleReceiptProvider sampleReceiptProvider = new SampleReceiptProvider();
 
-		TestUtility.sampleRecieptTestExecuter("FindBill2",
+		TestUtility.sampleRecieptTestExecuter("LastOne",
 				sampleReceiptProvider,
 				results,
-				imageFilter -> imageFilter.findBill2().convertToGrayScale().blackAndWhiteImageAdaptive()
+				imageFilter -> imageFilter.findBill2().convertToGrayScale()
+						.gaussianBlur()
+						.blackAndWhiteImageAdaptive()
 		);
 
 		Assert.assertTrue(true);
