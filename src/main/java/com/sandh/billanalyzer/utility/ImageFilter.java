@@ -87,6 +87,19 @@ public class ImageFilter extends AbstractTraceableOperator {
         return imageMatOut;
     }
 
+    public ImageFilter getImageInfo(){
+        proccessPreFileterActions();
+
+        this.imageMatOut = this.imageMat.clone();
+        int height = this.imageMatOut.height();
+        int width = this.imageMatOut.width();
+
+        String info = "Info["+height+" X "+width+" ] ";
+
+        return processPostFilterActions(info);
+    }
+
+
     public ImageFilter gaussianBlur(){
         proccessPreFileterActions();
 
@@ -97,8 +110,41 @@ public class ImageFilter extends AbstractTraceableOperator {
     private Mat gaussianBlur(Mat imageMatIn){
         Mat imageMatOut = new Mat();
         Imgproc.GaussianBlur(imageMatIn, imageMatOut, new Size(11, 11), 0);
+
         return imageMatOut;
     }
+
+    public ImageFilter orientImage(){
+        proccessPreFileterActions();
+
+        boolean needRotation = doesImageNeedRotation(this.imageMat);
+        this.imageMatOut = orientImage(this.imageMat);
+
+        return processPostFilterActions("orientImage["+needRotation+"]");
+    }
+    private Mat orientImage(Mat imageMatIn){
+        Mat imageMatOut = new Mat();
+        boolean needRotation = doesImageNeedRotation(this.imageMat);
+        int flipCode =1;
+
+        if(needRotation){
+            imageMatIn = imageMatIn.t();
+            Core.flip(imageMatIn,imageMatOut,flipCode);
+        }else{
+            imageMatOut=imageMatIn.clone();
+        }
+
+
+        return imageMatOut;
+    }
+
+    private boolean doesImageNeedRotation(Mat imageMatIn) {
+        int height = imageMatIn.height();
+        int width = imageMatIn.width();
+
+        return height<width;
+    }
+
 
     public ImageFilter blackAndWhiteImageAdaptive(){
         proccessPreFileterActions();

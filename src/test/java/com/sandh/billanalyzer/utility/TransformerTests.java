@@ -150,7 +150,7 @@ public class TransformerTests {
 		TestUtility.sampleRecieptTestExecuter("LastOne",
 				sampleReceiptProvider,
 				results,
-				imageFilter -> imageFilter.findBill2().convertToGrayScale()
+				imageFilter -> imageFilter.getImageInfo().orientImage().findBill2().convertToGrayScale()
 						.gaussianBlur()
 						.blackAndWhiteImageAdaptive()
 		);
