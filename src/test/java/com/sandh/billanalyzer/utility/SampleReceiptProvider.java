@@ -18,6 +18,7 @@ public class SampleReceiptProvider {
 
     private String testReceipts;
     private int numberOfReceiptsToProvide =0;
+    private String fileName=null;
 
     public SampleReceiptProvider(){
         this(-1);
@@ -26,6 +27,12 @@ public class SampleReceiptProvider {
     public SampleReceiptProvider(int numberOfReceiptsToProvide){
         setPathVariables();
         this.numberOfReceiptsToProvide = numberOfReceiptsToProvide;
+    }
+
+    public SampleReceiptProvider(String name){
+        setPathVariables();
+        this.numberOfReceiptsToProvide = 1;
+        this.fileName=name;
     }
 
     public  Iterator<SampleReceipt> getSampleRecieptsIterator(){
@@ -47,7 +54,12 @@ public class SampleReceiptProvider {
 
         for( Path imagePath : images){
             SampleReceipt sampleReceipt = createSampleReciept(imagePath);
-            sampleReceipts.add(sampleReceipt);
+            if(null==fileName){
+                sampleReceipts.add(sampleReceipt);
+            }else if(sampleReceipt.getImageName().contains(fileName)){
+                sampleReceipts.add(sampleReceipt);
+            }
+
             if(localMaxReciepts>-1 && sampleReceipts.size()>=localMaxReciepts){
                 break;
             }

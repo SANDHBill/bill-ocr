@@ -158,4 +158,16 @@ public class TransformerTests {
 		Assert.assertTrue(true);
 	}
 
+	@Test
+	public void testOCRQuality(){
+		SampleReceiptProvider sampleReceiptProvider = new SampleReceiptProvider("i11");
+		SampleReceipt sampleReceipt = sampleReceiptProvider.getSampleRecieptsIterator().next();
+		CharacterCounter characterCounter = new CharacterCounter();
+		try {
+			characterCounter.countCharacterFrequency(sampleReceipt.getText());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 }

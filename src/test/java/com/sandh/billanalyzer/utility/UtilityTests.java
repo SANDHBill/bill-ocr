@@ -19,8 +19,8 @@ public class UtilityTests {
 	String filePaths[] = {
 			"/Users/hamed/Documents/hws/java/workspaceIJ/BillAnalyser/src/test/resources/reciepts/i1.jpg",
 			"/Users/hamed/Documents/hws/java/workspaceIJ/BillAnalyser/src/test/resources/reciepts/i1.png",
-			"/Users/hamed/Documents/hws/java/workspaceIJ/BillAnalyser/src/test/resources/reciepts/i1.txt"};
-	String fileExtensions[] = {"i1.jpg","i1.png","i1.txt"};
+			"/Users/hamed/Documents/hws/java/workspaceIJ/BillAnalyser/src/test/resources/reciepts/i1.jpg.txt"};
+	String fileExtensions[] = {"i1.jpg","i1.png","i1.jpg.txt"};
 
 
 	@Test

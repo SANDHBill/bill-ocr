@@ -2,6 +2,8 @@ package com.sandh.billanalyzer.utility;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URL;
 
 /**
@@ -10,6 +12,7 @@ import java.net.URL;
 public class SampleReceipt {
     private final URL imageURL;
     private final URL textURL;
+
     private String result;
     private InputStream imageInputStream;
     private StringBuffer resultProccessingParameters = new StringBuffer();
@@ -53,5 +56,10 @@ public class SampleReceipt {
     public void addProccessingParameters(String proccessingParameters) {
         resultProccessingParameters.append(proccessingParameters);
         resultProccessingParameters.append(System.lineSeparator());
+    }
+
+    public Reader getText() throws IOException{
+        Reader textReader = new InputStreamReader(textURL.openStream());
+        return  textReader;
     }
 }
