@@ -145,7 +145,7 @@ public class TransformerTests {
 		TestUtility.sampleRecieptTestExecuter("LastOne",
 				sampleReceiptProvider,
 				results,
-				imageFilter -> imageFilter.getImageInfo().orientImage().findBill2().convertToGrayScale()
+				imageFilter -> imageFilter.getImageInfo().orientImage().findBill().convertToGrayScale()
 						.gaussianBlur()
 						.blackAndWhiteImageAdaptive()
 		);
@@ -153,7 +153,7 @@ public class TransformerTests {
 		Assert.assertTrue(true);
 	}
 
-	@Test
+
 	public void testOCRQuality(){
 		SampleReceiptProvider sampleReceiptProvider = new SampleReceiptProvider("i11");
 		SampleReceipt sampleReceipt = sampleReceiptProvider.getSampleRecieptsIterator().next();
@@ -170,5 +170,6 @@ public class TransformerTests {
 
 		Assert.assertTrue(result.isAtleast80percAccurate());
 	}
+
 
 }
