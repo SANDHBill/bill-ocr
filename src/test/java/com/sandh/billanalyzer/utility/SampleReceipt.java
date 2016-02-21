@@ -5,6 +5,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Created by hamed on 01/12/2015.
@@ -61,5 +64,13 @@ public class SampleReceipt {
     public Reader getText() throws IOException{
         Reader textReader = new InputStreamReader(textURL.openStream());
         return  textReader;
+    }
+
+    public String getTextString() throws IOException {
+        Path path = Paths.get(textURL.getPath());
+
+        String textcontent = new String(Files.readAllBytes(path));
+
+        return textcontent;
     }
 }

@@ -1,14 +1,9 @@
 package com.sandh.billanalyzer.utility;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.StringJoiner;
 
@@ -162,12 +157,18 @@ public class TransformerTests {
 	public void testOCRQuality(){
 		SampleReceiptProvider sampleReceiptProvider = new SampleReceiptProvider("i11");
 		SampleReceipt sampleReceipt = sampleReceiptProvider.getSampleRecieptsIterator().next();
-		CharacterCounter characterCounter = new CharacterCounter();
+		String subject = null;
 		try {
-			characterCounter.countCharacterFrequency(sampleReceipt.getText());
+			subject = sampleReceipt.getTextString();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		String reference ="HAMED";
+		QualityScore charFrequencyQualityTest = new CharFrequencyQualityScore(reference);
+
+		QualityScoreDetails result = charFrequencyQualityTest.test(subject);
+
+		Assert.assertTrue(result.isAtleast80percAccurate());
 	}
 
 }
