@@ -5,5 +5,5 @@ package com.sandh.billanalyzer.transformers;
  */
 public interface Transformer<FROM,TO> {
 
-    TO transform(FROM input);
+    TO transform(FROM input,String...params);
 }

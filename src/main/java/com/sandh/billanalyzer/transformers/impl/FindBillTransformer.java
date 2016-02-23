@@ -1,8 +1,9 @@
-package com.sandh.billanalyzer.transformers;
+package com.sandh.billanalyzer.transformers.impl;
 
 /**
  * Created by hamed on 21/02/2016.
  */
+import com.sandh.billanalyzer.transformers.Transformer;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
@@ -14,7 +15,7 @@ import java.util.stream.IntStream;
 public class FindBillTransformer implements Transformer<Mat,Mat> {
 
     @Override
-    public Mat transform(Mat input) {
+    public Mat transform(Mat input,String...params) {
         return findBill(input);
     }
     private Mat findBill(Mat imageMat){

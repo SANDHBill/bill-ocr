@@ -1,14 +1,12 @@
 package com.sandh.billanalyzer.utility;
 
-import com.sandh.billanalyzer.transformers.FindBillTransformer;
+import com.sandh.billanalyzer.transformers.impl.FindBillTransformer;
 import com.sandh.billanalyzer.transformers.TransformerMachine;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 
 
 /**
@@ -387,7 +385,7 @@ public class ImageFilter extends AbstractTraceableOperator {
         proccessPreFileterActions();
 
         this.imageMatOut =
-                (Mat)transformerMachine.process(FindBillTransformer.class.getName(),this.imageMat);
+                (Mat)transformerMachine.process(FindBillTransformer.class.getName(),this.imageMat).getProccessedObject();
 
         return processPostFilterActions("findBill");
     }
