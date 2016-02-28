@@ -75,7 +75,7 @@ public class TransformerTests {
 		
 		SampleReceiptProvider sampleReceiptProvider = new SampleReceiptProvider();
 
-		TestUtility.sampleRecieptTestExecuter("testOne",
+		TestUtility.sampleRecieptTestExecuter("blackwhite",
 				sampleReceiptProvider,
 				results,
 				imageFilter -> imageFilter
@@ -94,7 +94,7 @@ public class TransformerTests {
 
 		SampleReceiptProvider sampleReceiptProvider = new SampleReceiptProvider(1);
 
-		TestUtility.sampleRecieptTestExecuter("test2",
+		TestUtility.sampleRecieptTestExecuter("blackwhiteBlur",
 				sampleReceiptProvider,
 				results,
 				imageFilter -> imageFilter
@@ -160,7 +160,7 @@ public class TransformerTests {
 
 		SampleReceiptProvider sampleReceiptProvider = new SampleReceiptProvider();
 
-		TestUtility.sampleRecieptTestExecuter("LastOne",
+		TestUtility.sampleRecieptTestExecuter("OrientAdj",
 				sampleReceiptProvider,
 				results,
 				imageFilter -> imageFilter

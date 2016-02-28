@@ -30,7 +30,9 @@ public class BlackAndWhiteTrf implements Transformer<Mat,Mat> {
 
     private boolean checkIsAdaptive(String[] params) {
         if(params!=null){
-            return Arrays.asList().contains(ADAPTIVE);
+            int idx=Arrays.asList(params).indexOf(ADAPTIVE);
+
+            return idx>-1;
         }else{
             return false;
         }
