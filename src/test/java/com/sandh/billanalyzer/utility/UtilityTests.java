@@ -37,15 +37,20 @@ public class UtilityTests {
 	@Test
 	public void testConstructFileNameForOperationOutput(){
 
-        String expectedFileName = "countour_input_i1.jpg_output_jpg_blur";
+        String expectedFileName = "countour_input_i1.jpg_output_blur";
+
+		ProcessMaterial mockoutput =mock(ProcessMaterial.class);
+		when(mockoutput.mimeType()).thenReturn(Utility.fileType.IMAGE);
 
 		TraceableOperator testTraceableOp = mock(TraceableOperator.class);
 		when(testTraceableOp.getFilterName()).thenReturn("blur");
 		when(testTraceableOp.getOriginName()).thenReturn(filePaths[0]);
+		when(testTraceableOp.getOutput()).thenReturn(mockoutput);
 
 		String fileName =
 				Utility.constructFileNameForOperationOutput(
-						testTraceableOp,"countour","jpg");
+						testTraceableOp,
+						"countour");
 
 		Assert.assertEquals("incorrect name",fileName,expectedFileName);
 

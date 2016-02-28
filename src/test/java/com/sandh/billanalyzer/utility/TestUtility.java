@@ -65,22 +65,8 @@ public class TestUtility {
             SampleReceipt sampleReceipt =sampleReceipts.next();
             try (InputStream imageIn = sampleReceipt.getImageInputStream()) {
 
-                ImageFilter imageFilter =
-                        ImageFilterFactory.createFilterForInputStream(imageIn);
-
-                imageFilter.setOriginName(sampleReceipt.getImageName());
-                imageFilter.setDebugMode(true);
-
-                ImageFilter newImage =scenarioExecuter.executeScenario(imageFilter);
-
-                TraceableOperator[] history =
-                        newImage.getChain().toArray(new TraceableOperator[newImage.getChain().size()]);
-
-
-                sampleReceipt.setResult(history[history.length-2].getOutput().getAsString());
-                sampleReceipt.setHistory(history);
+                processSampleReciept(sampleReceipt,imageIn,scenarioExecuter);
                 results.add(sampleReceipt);
-
                 SaveHistoryToFile(testname,sampleReceipt);
                 LOG.info(TestUtility.getSampleRecieptDetails(sampleReceipt));
             } catch (FileNotFoundException e) {
@@ -93,26 +79,37 @@ public class TestUtility {
         }
     }
 
+    private static void processSampleReciept(SampleReceipt sampleReceipt,
+                                             InputStream imageIn,
+                                             ScenarioExecuter<ImageFilter> scenarioExecuter) throws IOException {
+        ImageFilter imageFilter = getImageFilter(sampleReceipt, imageIn);
+
+        ImageFilter newImage =scenarioExecuter.executeScenario(imageFilter);
+
+        TraceableOperator[] history =
+                newImage.getChain().toArray(new TraceableOperator[newImage.getChain().size()]);
+
+
+        sampleReceipt.setResult(history[history.length-2].getOutput().getAsString());
+        sampleReceipt.setHistory(history);
+    }
+
+    private static ImageFilter getImageFilter(SampleReceipt sampleReceipt, InputStream imageIn) throws IOException {
+        ImageFilter imageFilter =
+                ImageFilterFactory.createFilterForInputStream(imageIn);
+
+        imageFilter.setOriginName(sampleReceipt.getImageName());
+        imageFilter.setDebugMode(true);
+        return imageFilter;
+    }
+
     private static void SaveHistoryToFile(String testName,SampleReceipt sampleReceipt) {
         for(TraceableOperator filter:sampleReceipt.getHistory()){
             ProcessMaterial output = filter.getOutput();
             if(output==null){
                 continue;
             }
-            String stringOutput= filter.getOutput().getAsString();
-            Object objOutput = filter.getOutput().getAsObject();
-            if(null!=stringOutput) {
-                Utility.storeTextInTempFile(
-                        stringOutput,
-                        filter,testName);
-
-
-            }else if(null!= objOutput && objOutput instanceof Mat){
-
-                Utility.storeImageMatInTempFile(
-                        (Mat)objOutput,
-                        filter,testName);
-            }
+            Utility.storeOuputInTempFile(filter,testName);
             LOG.info(filter.getFilterName());
         }
     }

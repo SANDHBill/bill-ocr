@@ -1,6 +1,5 @@
 package com.sandh.billanalyzer.utility;
 
-import com.sandh.billanalyzer.transformers.*;
 import org.apache.commons.io.IOUtils;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
@@ -23,29 +22,40 @@ import java.util.stream.Collectors;
 public class Utility {
     public static final String TEST_RECEIPTS_OUTPUT ="TEST_RECEIPTS_OUTPUT";
 
+    public enum fileType{
+        UNKOWN("unknown"),IMAGE("png"),TEXT("txt");
+
+        private String value;
+        fileType(String pvalue){
+            value=pvalue;
+        }
+
+        public String asString(){
+            return value;
+        }
+    }
     private static Logger LOG = LoggerFactory.getLogger(Utility.class.getName());
 
 
-    public static void storeImageMatInTempFile(Mat imageMat,
-                                           TraceableOperator traceableOperator,
-                                               String prefix){
+    public static void storeOuputInTempFile(
+            TraceableOperator traceableOperator,
+            String prefix){
 
-        File file =storeImageStreamInTempFile(
-                matToInputStream(imageMat),
-                traceableOperator,prefix,"png");
-    }
-    public static void storeTextInTempFile(String text, TraceableOperator filter,String prefix) {
-        File file =storeImageStreamInTempFile(
-                new ByteArrayInputStream(text.getBytes()),
-                filter,prefix,"txt");
-    }
-    public static File storeImageStreamInTempFile(
-                                            InputStream imageStreamIn,
-                                            TraceableOperator traceableOperator,
-                                            String prefix,
-                                            String extension) {
+        String fileName = constructFileNameForOperationOutput(traceableOperator,prefix);
+        InputStream imageStreamIn=traceableOperator.getOutput().getInputStream();
 
-        String fileName = constructFileNameForOperationOutput(traceableOperator,prefix, extension);
+        File file =storeStreamInTempFile(
+                imageStreamIn,
+                fileName,
+                traceableOperator.getOutput().mimeType().asString(),
+                traceableOperator.isDebugMode());
+
+    }
+
+    public static File storeStreamInTempFile(InputStream is,
+                                             String fileName,
+                                             String extension,
+                                             boolean keepFile) {
 
         File tempFile = null;
 
@@ -56,7 +66,7 @@ public class Utility {
         }
 
         try(FileOutputStream fos = new FileOutputStream(tempFile)){
-            byte[] imageBytes = IOUtils.toByteArray(imageStreamIn);
+            byte[] imageBytes = IOUtils.toByteArray(is);
 
             fos.write(imageBytes);
             fos.flush();
@@ -65,7 +75,7 @@ public class Utility {
             e.printStackTrace();
         }
 
-        if(traceableOperator.isDebugMode()) {
+        if(keepFile) {
             LOG.info("File loc:{}", tempFile.getAbsolutePath());
         }else{
             tempFile.deleteOnExit();
@@ -74,8 +84,7 @@ public class Utility {
     }
 
     public static String constructFileNameForOperationOutput(TraceableOperator traceableOperator,
-                                                             String prefix,
-                                                             String extension) {
+                                                             String prefix) {
 
         String originalName = getFileName(traceableOperator.getOriginName());
         StringJoiner fileNameJoiner = new StringJoiner("_");
@@ -83,7 +92,6 @@ public class Utility {
         fileNameJoiner.add("input");
         fileNameJoiner.add(originalName);
         fileNameJoiner.add("output");
-        fileNameJoiner.add(extension);
         fileNameJoiner.add(traceableOperator.getFilterName());
         String fileName=fileNameJoiner.toString();
 

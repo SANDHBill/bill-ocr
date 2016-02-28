@@ -2,7 +2,6 @@ package com.sandh.billanalyzer.utility;
 
 import com.sandh.billanalyzer.transformers.TransformerMachine;
 import org.opencv.core.*;
-import java.util.LinkedList;
 
 
 /**
@@ -45,7 +44,19 @@ public class ImageFilter extends AbstractTraceableOperator {
 
     private ImageFilter processPostFilterActions(String operation,Object result) {
         final ImageFilter thisFilter = this;
-        this.output = new ProcessMaterial() {
+        this.output = createProcessMaterial(operation, result, thisFilter);
+        return new ImageFilter(this);
+    }
+
+    private ProcessMaterial createProcessMaterial(final String operation,
+                                                  final Object result,
+                                                  final ImageFilter thisFilter) {
+        return new ProcessMaterial() {
+            @Override
+            public String getTransformerName() {
+                return operation;
+            }
+
             @Override
             public String getAsString() {
                 String outPutAsString=null;
@@ -67,7 +78,6 @@ public class ImageFilter extends AbstractTraceableOperator {
                 return thisFilter;
             }
         };
-        return new ImageFilter(this);
     }
 
     private  synchronized void proccessPreFileterActions(String pFilterName) {
