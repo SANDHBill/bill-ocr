@@ -52,6 +52,7 @@ public class TransformerMachine {
                         processedObject,
                         input,
                         params);
+
         return traceableResult;
 
     }

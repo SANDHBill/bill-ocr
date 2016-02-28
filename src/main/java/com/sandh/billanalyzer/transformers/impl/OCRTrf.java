@@ -7,10 +7,10 @@ import org.opencv.core.Mat;
 /**
  * Created by hamed on 22/02/2016.
  */
-public class OCRTransformer implements Transformer<Mat,String> {
+public class OCRTrf implements Transformer<Mat,String>  {
     private tesseract.TessBaseAPI api;
 
-    public OCRTransformer() {
+    public OCRTrf() {
         api = new tesseract.TessBaseAPI();
         String tessdataPath = System.getProperties().getProperty("TESSDATA_PREFIX");
         int tessInitCodeInt = api.Init(tessdataPath, "ENG");

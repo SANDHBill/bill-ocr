@@ -84,7 +84,7 @@ public class Utility {
         fileNameJoiner.add(originalName);
         fileNameJoiner.add("output");
         fileNameJoiner.add(extension);
-        fileNameJoiner.add(traceableOperator.getOperation());
+        fileNameJoiner.add(traceableOperator.getFilterName());
         String fileName=fileNameJoiner.toString();
 
         return fileName;
@@ -217,4 +217,5 @@ public class Utility {
 
         return transformerClasses;
     }
+
 }

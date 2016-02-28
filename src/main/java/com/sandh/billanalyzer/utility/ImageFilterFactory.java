@@ -14,7 +14,7 @@ public class ImageFilterFactory {
 
     public static ImageFilter createFilterForMat(Mat inputImageMat){
 
-        return  ImageFilter.createFilterForMat(inputImageMat);
+        return  new ImageFilter(inputImageMat);
     }
 
     public static ImageFilter createFilterForInputStream(InputStream inputImageStream)

@@ -1,5 +1,6 @@
 package com.sandh.billanalyzer.utility;
 
+import org.opencv.core.Mat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,16 +67,18 @@ public class TestUtility {
 
                 ImageFilter imageFilter =
                         ImageFilterFactory.createFilterForInputStream(imageIn);
+
                 imageFilter.setOriginName(sampleReceipt.getImageName());
                 imageFilter.setDebugMode(true);
 
                 ImageFilter newImage =scenarioExecuter.executeScenario(imageFilter);
 
+                TraceableOperator[] history =
+                        newImage.getChain().toArray(new TraceableOperator[newImage.getChain().size()]);
 
-                OCRTransformer ocrTransformer = new OCRTransformer(newImage.getHistory());
 
-                sampleReceipt.setResult(ocrTransformer.transform(newImage));
-                sampleReceipt.setHistory(ocrTransformer.getHistory());
+                sampleReceipt.setResult(history[history.length-2].getOutput().getAsString());
+                sampleReceipt.setHistory(history);
                 results.add(sampleReceipt);
 
                 SaveHistoryToFile(testname,sampleReceipt);
@@ -91,17 +94,26 @@ public class TestUtility {
     }
 
     private static void SaveHistoryToFile(String testName,SampleReceipt sampleReceipt) {
-        for(TraceableOperator filter:sampleReceipt.getHistory().getHistoryItems()){
-            if(null!= filter.getProcessMaterial().getAsImageFilter()) {
-                Utility.storeImageMatInTempFile(
-                        filter.getProcessMaterial().getAsImageFilter().getImageMat(),
-                        filter,testName);
-            }else if(null!= filter.getProcessMaterial().getAsString()){
+        for(TraceableOperator filter:sampleReceipt.getHistory()){
+            ProcessMaterial output = filter.getOutput();
+            if(output==null){
+                continue;
+            }
+            String stringOutput= filter.getOutput().getAsString();
+            Object objOutput = filter.getOutput().getAsObject();
+            if(null!=stringOutput) {
                 Utility.storeTextInTempFile(
-                        filter.getProcessMaterial().getAsString(),
+                        stringOutput,
+                        filter,testName);
+
+
+            }else if(null!= objOutput && objOutput instanceof Mat){
+
+                Utility.storeImageMatInTempFile(
+                        (Mat)objOutput,
                         filter,testName);
             }
-            LOG.info(filter.getOperation());
+            LOG.info(filter.getFilterName());
         }
     }
 }

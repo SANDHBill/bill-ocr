@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
 
+import com.sandh.billanalyzer.transformers.impl.*;
 import org.opencv.core.Core;
 
 import org.junit.Assert;
@@ -77,8 +78,10 @@ public class TransformerTests {
 		TestUtility.sampleRecieptTestExecuter("testOne",
 				sampleReceiptProvider,
 				results,
-				imageFilter -> imageFilter.convertToGrayScale()
-						.blackAndWhiteImage()
+				imageFilter -> imageFilter
+                        .apply(GrayScaleTrf.class.getName())
+                        .apply(BlackAndWhiteTrf.class.getName())
+						.apply(OCRTrf.class.getName())
 		);
 
 		Assert.assertTrue(true);
@@ -94,8 +97,11 @@ public class TransformerTests {
 		TestUtility.sampleRecieptTestExecuter("test2",
 				sampleReceiptProvider,
 				results,
-				imageFilter -> imageFilter.convertToGrayScale()
-						.gaussianBlur().blackAndWhiteImageAdaptive()
+				imageFilter -> imageFilter
+                        .apply(GrayScaleTrf.class.getName())
+                        .apply(BlurTrf.class.getName())
+                        .apply(BlackAndWhiteTrf.class.getName())
+						.apply(OCRTrf.class.getName())
 		);
 
 		Assert.assertTrue(true);
@@ -111,8 +117,14 @@ public class TransformerTests {
 		TestUtility.sampleRecieptTestExecuter("Contour",
 				sampleReceiptProvider,
 				results,
-				imageFilter -> imageFilter.convertToGrayScale()
-						.gaussianBlur().blackAndWhiteImageAdaptive().clearSmallBlackDots(300, 0.9)
+				imageFilter -> imageFilter
+                        .apply(GrayScaleTrf.class.getName())
+                        .apply(BlurTrf.class.getName())
+                        .apply(BlackAndWhiteTrf.class.getName(), BlackAndWhiteTrf.ADAPTIVE)
+                        .apply(RemoveNoiseTrf.class.getName(),
+                                Param.entry(RemoveNoiseTrf.CONTOUR_SIZE,300),
+                                Param.entry(RemoveNoiseTrf.THRESHOLD,0.9))
+						.apply(OCRTrf.class.getName())
 		);
 
 		Assert.assertTrue(true);
@@ -124,12 +136,18 @@ public class TransformerTests {
 		List<SampleReceipt> results = new ArrayList<>();
 
 		SampleReceiptProvider sampleReceiptProvider = new SampleReceiptProvider();
-
 		TestUtility.sampleRecieptTestExecuter("detectBoundries",
 				sampleReceiptProvider,
 				results,
-				imageFilter -> imageFilter.convertToGrayScale()
-						.gaussianBlur().blackAndWhiteImageAdaptive().detectLines().clearSmallBlackDots(300, 0.9)
+				imageFilter -> imageFilter
+                        .apply(GrayScaleTrf.class.getName())
+                        .apply(BlurTrf.class.getName())
+                        .apply(BlackAndWhiteTrf.class.getName(), BlackAndWhiteTrf.ADAPTIVE)
+                        .apply(DetectLinesTrf.class.getName())
+                        .apply(RemoveNoiseTrf.class.getName(),
+                                Param.entry(RemoveNoiseTrf.CONTOUR_SIZE,300),
+                                Param.entry(RemoveNoiseTrf.THRESHOLD,0.9))
+						.apply(OCRTrf.class.getName())
 		);
 
 		Assert.assertTrue(true);
@@ -145,15 +163,35 @@ public class TransformerTests {
 		TestUtility.sampleRecieptTestExecuter("LastOne",
 				sampleReceiptProvider,
 				results,
-				imageFilter -> imageFilter.getImageInfo().orientImage().findBill().convertToGrayScale()
-						.gaussianBlur()
-						.blackAndWhiteImageAdaptive()
+				imageFilter -> imageFilter
+                        .apply(AdjustOrientationTrf.class.getName())
+                        .apply(FindBillTrf.class.getName())
+                        .apply(GrayScaleTrf.class.getName())
+						.apply(BlurTrf.class.getName())
+						.apply(BlackAndWhiteTrf.class.getName(),BlackAndWhiteTrf.ADAPTIVE)
+                        .apply(OCRTrf.class.getName())
 		);
 
 		Assert.assertTrue(true);
 	}
 
+@Test
+public void testTransformersGoogle() {
 
+	List<SampleReceipt> results = new ArrayList<>(1);
+
+	SampleReceiptProvider sampleReceiptProvider = new SampleReceiptProvider("i1_low.jpg");
+
+	TestUtility.sampleRecieptTestExecuter("Google",
+			sampleReceiptProvider,
+			results,
+			imageFilter -> imageFilter
+                    .apply(AdjustOrientationTrf.class.getName())
+                    .apply(GoogleTrf.class.getName())
+	);
+
+	Assert.assertTrue(true);
+}
 	public void testOCRQuality(){
 		SampleReceiptProvider sampleReceiptProvider = new SampleReceiptProvider("i11");
 		SampleReceipt sampleReceipt = sampleReceiptProvider.getSampleRecieptsIterator().next();

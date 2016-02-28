@@ -1,5 +1,7 @@
 package com.sandh.billanalyzer.utility;
 
+import java.util.List;
+
 /**
  * Created by hamed on 02/12/2015.
  */
@@ -8,21 +10,17 @@ public interface TraceableOperator {
 
     void setOriginName(String originName);
 
-    String getParameters();
-
-    void setParameters(String parameters);
-
     boolean isDebugMode();
 
     void setDebugMode(boolean debugMode);
 
-    String getOperation();
+    TraceableOperator getLastOperation();
 
-    ProcessMaterial getProcessMaterial();
+    List<TraceableOperator> getChain();
 
-    FilterHistory getHistory();
+    ProcessMaterial getOutput();
+    String getFilterName();
 
-    void setHistory(FilterHistory history);
 
 
 }

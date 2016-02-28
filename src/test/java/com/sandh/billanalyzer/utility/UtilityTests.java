@@ -40,7 +40,7 @@ public class UtilityTests {
         String expectedFileName = "countour_input_i1.jpg_output_jpg_blur";
 
 		TraceableOperator testTraceableOp = mock(TraceableOperator.class);
-		when(testTraceableOp.getOperation()).thenReturn("blur");
+		when(testTraceableOp.getFilterName()).thenReturn("blur");
 		when(testTraceableOp.getOriginName()).thenReturn(filePaths[0]);
 
 		String fileName =

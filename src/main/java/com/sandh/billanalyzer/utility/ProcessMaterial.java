@@ -7,5 +7,7 @@ public interface ProcessMaterial {
 
     String getAsString();
 
-    ImageFilter getAsImageFilter();
+    Object getAsObject();
+
+    ImageFilter getImageFilter();
 }

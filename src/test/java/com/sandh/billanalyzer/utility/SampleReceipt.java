@@ -17,18 +17,17 @@ public class SampleReceipt {
     private final URL textURL;
 
     private String result;
-    private InputStream imageInputStream;
     private StringBuffer resultProccessingParameters = new StringBuffer();
 
-    public void setHistory(FilterHistory history) {
+    public void setHistory(TraceableOperator[] history) {
         this.history = history;
     }
 
-    public FilterHistory getHistory() {
+    public TraceableOperator[] getHistory() {
         return history;
     }
 
-    private FilterHistory history;
+    private TraceableOperator[] history;
 
 
     public SampleReceipt(URL imageUrl, URL textUrl) {

@@ -58,7 +58,31 @@
       <artifactId>commons-math3</artifactId>
       <version>3.6</version>
     </dependency>
-
+    <dependency>
+      <groupId>com.mashape.unirest</groupId>
+      <artifactId>unirest-java</artifactId>
+      <version>1.4.8</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>4.3.6</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpasyncclient</artifactId>
+      <version>4.0.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpmime</artifactId>
+      <version>4.3.6</version>
+    </dependency>
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20140107</version>
+    </dependency>
     <!-- 3. logback -->
     <dependency>
       <groupId>ch.qos.logback</groupId>
@@ -71,6 +95,7 @@
       <version>${spring.version}</version>
       <scope>test</scope>
     </dependency>
+
   <!--testing -->
     <dependency>
       <groupId>junit</groupId>
@@ -84,6 +109,7 @@
       <version>2.0.33-beta</version>
       <scope>test</scope>
     </dependency>
+
   </dependencies>
 
   <build>

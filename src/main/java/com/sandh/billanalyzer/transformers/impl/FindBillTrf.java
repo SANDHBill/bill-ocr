@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
-public class FindBillTransformer implements Transformer<Mat,Mat> {
+public class FindBillTrf implements Transformer<Mat,Mat> {
 
     @Override
     public Mat transform(Mat input,String...params) {

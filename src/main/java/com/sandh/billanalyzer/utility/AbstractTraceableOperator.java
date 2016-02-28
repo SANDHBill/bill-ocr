@@ -1,27 +1,37 @@
 package com.sandh.billanalyzer.utility;
 
 
+import java.util.LinkedList;
+import java.util.List;
+
 public abstract class AbstractTraceableOperator implements TraceableOperator {
 
 	private volatile boolean debugMode = false;
 
-	private String parameters="";
 	private String originName="";
-	protected String lastOperation="";
-	private FilterHistory history;
 
-	@Override
-	public FilterHistory getHistory() {
-		return history;
+    public String getFilterName() {
+        return filterName;
+    }
+
+    String filterName="Not set";
+	List<TraceableOperator> operationChain;
+
+	AbstractTraceableOperator(){
+		operationChain = new LinkedList<TraceableOperator>();
+        operationChain.add(this);
+	}
+	AbstractTraceableOperator(TraceableOperator parent){
+		operationChain = parent.getChain();
+        operationChain.add(this);
+		setDebugMode(parent.isDebugMode());
+		setOriginName(parent.getOriginName());
 	}
 
-	@Override
-	public void setHistory(FilterHistory history) {
-		this.history = history;
-	}
-
-
-
+    ProcessMaterial output;
+    public ProcessMaterial getOutput() {
+        return output;
+    }
 	@Override
 	public String getOriginName() {
 		return originName;
@@ -33,16 +43,6 @@ public abstract class AbstractTraceableOperator implements TraceableOperator {
 	}
 
 	@Override
-	public String getParameters() {
-		return parameters;
-	}
-
-	@Override
-	public void setParameters(String parameters) {
-		this.parameters = parameters;
-	}
-
-	@Override
 	public boolean isDebugMode() {
 		return debugMode;
 	}
@@ -51,8 +51,12 @@ public abstract class AbstractTraceableOperator implements TraceableOperator {
 		this.debugMode = debugMode;
 	}
 	@Override
-	public String getOperation(){
-		return lastOperation;
+	public TraceableOperator getLastOperation(){
+		return operationChain.get(operationChain.size()-1);
+	}
+
+	public List<TraceableOperator> getChain(){
+		return operationChain;
 	}
 
 
