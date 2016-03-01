@@ -71,13 +71,11 @@ public class TransformerTests {
 	@Test
 	public void testTransformersGrayScaleBlackAndWhite() {
 
-		List<SampleReceipt> results = new ArrayList<>();
 		
 		SampleReceiptProvider sampleReceiptProvider = new SampleReceiptProvider();
 
-		TestUtility.sampleRecieptTestExecuter("blackwhite",
+        List<SampleReceipt> results = TestUtility.sampleRecieptTestExecuter("blackwhite",
 				sampleReceiptProvider,
-				results,
 				imageFilter -> imageFilter
                         .apply(GrayScaleTrf.class.getName())
                         .apply(BlackAndWhiteTrf.class.getName())
@@ -90,13 +88,11 @@ public class TransformerTests {
 	@Test
 	public void testTransformersGrayScaleBlackAndWhiteAdaptive() {
 
-		List<SampleReceipt> results = new ArrayList<>();
 
 		SampleReceiptProvider sampleReceiptProvider = new SampleReceiptProvider(1);
 
-		TestUtility.sampleRecieptTestExecuter("blackwhiteBlur",
+        List<SampleReceipt> results = TestUtility.sampleRecieptTestExecuter("blackwhiteBlur",
 				sampleReceiptProvider,
-				results,
 				imageFilter -> imageFilter
                         .apply(GrayScaleTrf.class.getName())
                         .apply(BlurTrf.class.getName())
@@ -110,13 +106,11 @@ public class TransformerTests {
 	@Test
 	public void testTransformersGrayScaleBlackAndWhiteAdaptiveClearSmallBlackDots() {
 
-		List<SampleReceipt> results = new ArrayList<>();
 
 		SampleReceiptProvider sampleReceiptProvider = new SampleReceiptProvider();
 
-		TestUtility.sampleRecieptTestExecuter("Contour",
+        List<SampleReceipt> results = TestUtility.sampleRecieptTestExecuter("Contour",
 				sampleReceiptProvider,
-				results,
 				imageFilter -> imageFilter
                         .apply(GrayScaleTrf.class.getName())
                         .apply(BlurTrf.class.getName())
@@ -133,12 +127,10 @@ public class TransformerTests {
 	@Test
 	public void testTransformersGrayScaleBlackAndWhiteAdaptiveFindBillClearSmallBlackDots() {
 
-		List<SampleReceipt> results = new ArrayList<>();
 
 		SampleReceiptProvider sampleReceiptProvider = new SampleReceiptProvider();
-		TestUtility.sampleRecieptTestExecuter("detectBoundries",
+        List<SampleReceipt> results = TestUtility.sampleRecieptTestExecuter("detectBoundries",
 				sampleReceiptProvider,
-				results,
 				imageFilter -> imageFilter
                         .apply(GrayScaleTrf.class.getName())
                         .apply(BlurTrf.class.getName())
@@ -156,13 +148,11 @@ public class TransformerTests {
 	@Test
 	public void testTransformersFindBill() {
 
-		List<SampleReceipt> results = new ArrayList<>(1);
 
 		SampleReceiptProvider sampleReceiptProvider = new SampleReceiptProvider();
 
-		TestUtility.sampleRecieptTestExecuter("OrientAdj",
+        List<SampleReceipt> results = TestUtility.sampleRecieptTestExecuter("OrientAdj",
 				sampleReceiptProvider,
-				results,
 				imageFilter -> imageFilter
                         .apply(AdjustOrientationTrf.class.getName())
                         .apply(FindBillTrf.class.getName())
@@ -178,13 +168,11 @@ public class TransformerTests {
 @Test
 public void testTransformersGoogle() {
 
-	List<SampleReceipt> results = new ArrayList<>(1);
 
 	SampleReceiptProvider sampleReceiptProvider = new SampleReceiptProvider("i1_low.jpg");
 
-	TestUtility.sampleRecieptTestExecuter("Google",
+    List<SampleReceipt> results = TestUtility.sampleRecieptTestExecuter("Google",
 			sampleReceiptProvider,
-			results,
 			imageFilter -> imageFilter
                     .apply(AdjustOrientationTrf.class.getName())
                     .apply(GoogleTrf.class.getName())
@@ -192,17 +180,27 @@ public void testTransformersGoogle() {
 
 	Assert.assertTrue(true);
 }
+
+    @Test
 	public void testOCRQuality(){
-		SampleReceiptProvider sampleReceiptProvider = new SampleReceiptProvider("i11");
-		SampleReceipt sampleReceipt = sampleReceiptProvider.getSampleRecieptsIterator().next();
-		String subject = null;
+		SampleReceiptProvider sampleReceiptProvider = new SampleReceiptProvider("i11_low");
+
+        List<SampleReceipt> results = TestUtility.sampleRecieptTestExecuter("Google",
+                sampleReceiptProvider,
+                imageFilter -> imageFilter
+                        .apply(AdjustOrientationTrf.class.getName())
+                        .apply(GoogleTrf.class.getName())
+        );
+
+		String subject = results.get(0).getResult();
+        String refTex="";
 		try {
-			subject = sampleReceipt.getTextString();
+            refTex = results.get(0).getReferenceTextString();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		String reference ="HAMED";
-		QualityScore charFrequencyQualityTest = new CharFrequencyQualityScore(reference);
+
+		QualityScore charFrequencyQualityTest = new CharFrequencyQualityScore(refTex);
 
 		QualityScoreDetails result = charFrequencyQualityTest.test(subject);
 

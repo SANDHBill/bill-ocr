@@ -60,12 +60,12 @@ public class SampleReceipt {
         resultProccessingParameters.append(System.lineSeparator());
     }
 
-    public Reader getText() throws IOException{
+    public Reader getReferenceText() throws IOException{
         Reader textReader = new InputStreamReader(textURL.openStream());
         return  textReader;
     }
 
-    public String getTextString() throws IOException {
+    public String getReferenceTextString() throws IOException {
         Path path = Paths.get(textURL.getPath());
 
         String textcontent = new String(Files.readAllBytes(path));

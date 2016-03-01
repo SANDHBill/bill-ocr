@@ -1,5 +1,6 @@
 package com.sandh.billanalyzer.transformers.impl;
 
+import com.jayway.jsonpath.JsonPath;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -9,6 +10,7 @@ import com.sandh.billanalyzer.utility.Utility;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Base64;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
@@ -38,8 +40,9 @@ public class GoogleTrf implements Transformer<Mat, String> {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        return jsonResponse.getBody().toString();
+        List<String> parsed = JsonPath.parse(jsonResponse.getBody().toString()).read("$..description");
+        String description=parsed.get(0);
+        return description;
     }
 
     public JsonNode createJason(InputStream in) throws IOException {

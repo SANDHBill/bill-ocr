@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -53,10 +54,11 @@ public class TestUtility {
 
     }
 
-    public static void sampleRecieptTestExecuter(String testname,
+    public static List<SampleReceipt> sampleRecieptTestExecuter(String testname,
             SampleReceiptProvider sampleReceiptProvider,
-            List<SampleReceipt> results,
             ScenarioExecuter<ImageFilter> scenarioExecuter){
+
+        List<SampleReceipt> results = new ArrayList<>();
 
         Iterator<SampleReceipt> sampleReceipts;
         sampleReceipts = sampleReceiptProvider.getSampleRecieptsIterator();
@@ -77,6 +79,7 @@ public class TestUtility {
                 e.printStackTrace();
             }
         }
+        return results;
     }
 
     private static void processSampleReciept(SampleReceipt sampleReceipt,
