@@ -1,15 +1,21 @@
 package com.sandh.billanalyzer.utility;
 
 import java.util.AbstractMap;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Created by hamed on 20/02/2016.
  */
 public class CharFrequencyQualityScore implements QualityScore {
+
+    public static final int ASCII_SPACE = 32;
+    public static final int ASCII_LF = 10;
+    static int[] ignoreList={ASCII_SPACE,ASCII_LF};
     
     CharacterCounter characterCounter = new CharacterCounter();
     private  String reference;
@@ -54,7 +60,11 @@ public class CharFrequencyQualityScore implements QualityScore {
         Long countRef=item.getValue();
         Long countSubject=subjectResult.remove(ch);
         StringJoiner resultBuilder = new StringJoiner(";");
-        boolean test=countSubject!=null && countRef.longValue()==countSubject.longValue();
+
+        boolean isInIgnoreList = IntStream.of(ignoreList).anyMatch(x->x==(int)ch.charValue());
+
+        boolean test=countSubject!=null && (
+                isInIgnoreList || countRef.longValue()==countSubject.longValue());
         resultBuilder.add(String.valueOf(test));
         resultBuilder.add(countRef+":"+countSubject);
         String evaluationResult = resultBuilder.toString();

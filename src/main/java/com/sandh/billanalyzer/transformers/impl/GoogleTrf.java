@@ -21,7 +21,7 @@ import org.opencv.core.Mat;
  * Created by hamed on 24/02/2016.
  */
 public class GoogleTrf implements Transformer<Mat, String> {
-    private static final String API_KEY = "AIzaSyCh0o72_QztrBo8NzgodeGL_h-WoqojL34";
+    private static final String API_KEY = "AIzaSyA72PDph8o5KeihU1mf1mTdNG3o5gjNJg4";
 
     @Override
     public String transform(Mat input, String... params) {
@@ -29,7 +29,9 @@ public class GoogleTrf implements Transformer<Mat, String> {
         try {
             InputStream in = Utility.matToInputStream(input);
             JsonNode imageJason = createJason(in);
-            jsonResponse = Unirest.post("https://vision.googleapis.com/v1/images:annotate")
+            Unirest.setTimeouts(1000,30000);
+            jsonResponse = Unirest
+                    .post("https://vision.googleapis.com/v1/images:annotate")
                     .header("accept", "application/json")
                     .header("Content-Type", "application/json")
                     .queryString("key", API_KEY)

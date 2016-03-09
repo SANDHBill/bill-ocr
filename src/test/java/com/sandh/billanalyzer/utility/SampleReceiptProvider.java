@@ -72,7 +72,9 @@ public class SampleReceiptProvider {
         SampleReceipt sampleReceipt = null;
         try {
             URL imageUrl = imagePath.toUri().toURL();
-            URL textUrl = imagePath.resolveSibling(imagePath.toFile().getName().split("_")[0]+".txt").toUri().toURL();
+            String textRefFileName = imagePath.toFile().getName().split("[_\\.]")[0]+".txt";
+
+            URL textUrl = imagePath.resolveSibling(textRefFileName).toUri().toURL();
             sampleReceipt = new SampleReceipt(imageUrl,textUrl);
         } catch (MalformedURLException e) {
             e.printStackTrace();

@@ -183,12 +183,16 @@ public void testTransformersGoogle() {
 
     @Test
 	public void testOCRQuality(){
-		SampleReceiptProvider sampleReceiptProvider = new SampleReceiptProvider("i11_low");
+		SampleReceiptProvider sampleReceiptProvider = new SampleReceiptProvider("i11.");
 
         List<SampleReceipt> results = TestUtility.sampleRecieptTestExecuter("Google",
                 sampleReceiptProvider,
                 imageFilter -> imageFilter
                         .apply(AdjustOrientationTrf.class.getName())
+                        .apply(FindBillTrf.class.getName())
+                        .apply(GrayScaleTrf.class.getName())
+                        .apply(BlurTrf.class.getName())
+                        .apply(BlackAndWhiteTrf.class.getName(),BlackAndWhiteTrf.ADAPTIVE)
                         .apply(GoogleTrf.class.getName())
         );
 
